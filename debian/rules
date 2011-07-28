@@ -1,0 +1,142 @@
+#!/usr/bin/make -f
+
+%:
+	@echo '\
+#define _GNU_SOURCE                                                            \
+#include <stdio.h>                                                             \
+#include <unistd.h>                                                            \
+#include <stdlib.h>                                                            \
+#include <sys/stat.h>                                                          \
+#include <string.h>                                                            \
+                                                                               \
+#define ERROR(...) do { fprintf(stderr, __VA_ARGS__); return 1; } while (0)    \
+                                                                               \
+char ver[128];                                                                 \
+                                                                               \
+int gencontrol() // also, fills in ver                                         \
+{                                                                              \
+    FILE *clog, *src, *out;                                                    \
+    char desc[65536], *ds, *de;                                                \
+                                                                               \
+    clog = fopen("debian/changelog", "r");                                     \
+    if (!clog)                                                                 \
+        ERROR("Can’t read debian/changelog.\\n");                              \
+    if (fscanf(clog, "%*s (%127s %*s urgency=", ver) != 1)                     \
+        ERROR("Error parsing debian/changelog: can’t get the version number.\\n"); \
+    if (*ver)                                                                  \
+        ver[strlen(ver) - 1] = 0; // axe the ")" sscanf leaves                 \
+                                                                               \
+    src = fopen("debian/control", "r");                                        \
+    if (!src)                                                                  \
+        ERROR("Can’t read debian/control.\n");                                 \
+    fread(desc, 1, sizeof(desc), src);                                         \
+    if (!(ds = strstr(desc, "\nDescription: ")))                               \
+        ERROR("Can’t find the description in debian/control.\n");              \
+    de = ++ds;                                                                 \
+    while (*(de = strchrnul(de + 1, 0xa)))                                     \
+        if (de[1] != 0x20)                                                     \
+            break;                                                             \
+                                                                               \
+    out = fopen("control", "w");                                               \
+    if (!out)                                                                  \
+        ERROR("Can’t create the control file.\\n");                            \
+    fprintf(out,                                                               \
+        "Package: goodbye\\n"                                                  \
+        "Version: %s\\n"                                                       \
+        "Architecture: all\\n"                                                 \
+        "Maintainer: Adam Borowski <kilobyte@angband.pl>\\n"                   \
+        "Section: misc\\n"                                                     \
+        "Priority: optional\\n"                                                \
+        "%*s",                                                                 \
+        ver, (int)(de - ds), ds);                                              \
+    fclose(out);                                                               \
+    return 0;                                                                  \
+}                                                                              \
+                                                                               \
+int gendbinary()                                                               \
+{                                                                              \
+    FILE *f = fopen("debian-binary", "w");                                     \
+    if (!f)                                                                    \
+        ERROR("Can’t create debian-binary.\\n");                               \
+    fprintf(f, "2.0\\n");                                                      \
+    fclose(f);                                                                 \
+    return 0;                                                                  \
+}                                                                              \
+                                                                               \
+int do_target(const char *target)                                              \
+{                                                                              \
+    int cmd = 0;                                                               \
+    const char *c;                                                             \
+    char str[128];                                                             \
+    FILE *df;                                                                  \
+                                                                               \
+    // behaviour for undocumented targets is undefined...                      \
+    // (checking the full string would be too sane)                            \
+    for (c = target; *c; c++)                                                  \
+        cmd += *c;                                                             \
+                                                                               \
+    printf("doing: [%s]\\n", target, cmd);                                     \
+                                                                               \
+    switch(cmd)                                                                \
+    {                                                                          \
+    case 528:  // build                                                        \
+    case 987:  // build-arch                                                   \
+    case 1101: // build-indep                                                  \
+    case 1104: // binary-arch                                                  \
+        return 0;                                                              \
+    case 645:  // binary                                                       \
+    case 1218: // binary-indep                                                 \
+        mkdir("usr", 0777);                                                    \
+        mkdir("usr/bin", 0777);                                                \
+        link("goodbye", "usr/bin/goodbye");                                    \
+        mkdir("usr/share", 0777);                                              \
+        mkdir("usr/share/man", 0777);                                          \
+        mkdir("usr/share/man/man1", 0777);                                     \
+        system("gzip -9 <goodbye.1 >usr/share/man/man1/goodbye.1.gz");         \
+        mkdir("usr/share/doc", 0777);                                          \
+        mkdir("usr/share/doc/goodbye", 0777);                                  \
+        system("gzip -9 <debian/changelog "                                    \
+               ">usr/share/doc/goodbye/changelog.Debian.gz");                  \
+        link("debian/copyright", "usr/share/doc/goodbye/copyright");           \
+        system("tar cfz data.tar.gz --owner root --group root usr");           \
+                                                                               \
+        if (gencontrol())                                                      \
+            return 1;                                                          \
+        system("tar cfz control.tar.gz control");                              \
+                                                                               \
+        if (gendbinary())                                                      \
+            return 1;                                                          \
+                                                                               \
+        snprintf(str, sizeof(str), "../goodbye_%s_all.deb", ver);              \
+        unlink(str);                                                           \
+        snprintf(str, sizeof(str), "ar r ../goodbye_%s_all.deb debian-binary " \
+                                       "control.tar.gz data.tar.gz", ver);     \
+        if (system(str))                                                       \
+            return 1;                                                          \
+                                                                               \
+        df = fopen("debian/files", "w");                                       \
+        if (!df)                                                               \
+            ERROR("Can’t create debian/files.\\n");                            \
+        fprintf(df, "goodbye_%s_all.deb misc optional\\n", ver);               \
+        return 0;                                                              \
+    case 515:  // clean                                                        \
+        system("rm -rf usr");                                                  \
+        unlink("control");                                                     \
+        unlink("debian-binary");                                               \
+        unlink("data.tar.gz");                                                 \
+        unlink("control.tar.gz");                                              \
+        unlink("debian/files");                                                \
+        return 0;                                                              \
+    default:                                                                   \
+        return 42; // undefined behaviour!                                     \
+    }                                                                          \
+}                                                                              \
+                                                                               \
+int main(int argc, const char **argv)                                          \
+{                                                                              \
+    while (argc > 1)                                                           \
+        if (do_target(argv[--argc]))                                           \
+            return 1;                                                          \
+    return 0;                                                                  \
+}                                                                              \
+	'|sed 's/\\$$//'|tcc -run - $@

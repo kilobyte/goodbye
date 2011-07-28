@@ -1,0 +1,8 @@
+#!/usr/bin/perl -w
+
+my $_ = "Goodbye sanity!\n";
+
+$_ =~ tr [a-zA-Z] [n-za-mN-ZA-M];
+$_ =~ tr [a-zA-Z] [n-za-mN-ZA-M];
+
+print;

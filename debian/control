@@ -1,0 +1,15 @@
+Source: goodbye
+Maintainer: Adam Borowski <kilobyte@angband.pl>
+Build-Depends: tcc
+Section: misc
+Priority: optional
+Standards-Version: 3.9.2
+
+Package: goodbye
+Architecture: all
+Description: next part after 'hello', and a packaging example
+ This is the much needed step after the traditional 'Hello world.'.
+ .
+ In fact, though, it is an example for Debian developers: a showcase of
+ efficient packaging techniques.  It doesn’t require slow debhelper or even
+ dpkg-dev, but uses a JIT compiler for speed.
