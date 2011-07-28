@@ -4,6 +4,8 @@ Build-Depends: tcc
 Section: misc
 Priority: optional
 Standards-Version: 3.9.2
+Vcs-Git: git://gitorious.org/pkg-goodbye/goodbye.git
+Vcs-Browser: https://gitorious.org/pkg-goodbye/goodbye/commits/master
 
 Package: goodbye
 Architecture: all
