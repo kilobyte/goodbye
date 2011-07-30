@@ -1,5 +1,5 @@
 goodbye (0.1-1) unstable; urgency=low
 
-  * Initial unrelease.
+  * Initial release.  Closes: #636016.
 
  -- Adam Borowski <kilobyte@angband.pl>  Thu, 28 Jul 2011 12:54:53 +0200
