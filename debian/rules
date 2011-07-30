@@ -47,6 +47,7 @@ int gencontrol() // also, fills in ver                                         \
         "Maintainer: Adam Borowski <kilobyte@angband.pl>\\n"                   \
         "Section: misc\\n"                                                     \
         "Priority: optional\\n"                                                \
+        "Homepage: file:///dev/null\\n"                                        \
         "%*s",                                                                 \
         ver, (int)(de - ds), ds);                                              \
     fclose(out);                                                               \
