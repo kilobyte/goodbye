@@ -1,0 +1,8 @@
+0.2:
+* A dummy changelog.
+  It is needed to keep lintian --pedantic silent.  It feels wrong to me for
+  it to complain about things that come or not from the upstream, but hey,
+  we can't have such a stellar example with a --pedantic noise :p
+
+0.1:
+* Initial release.

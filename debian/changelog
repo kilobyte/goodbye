@@ -1,3 +1,11 @@
+goodbye (0.2-1) unstable; urgency=low
+
+  * New "upstream" release.
+    - needed to have an upstream changelog to shut up lintian --pedantic.
+  * A spanking shiny Homepage.
+
+ -- Adam Borowski <kilobyte@angband.pl>  Sat, 30 Jul 2011 14:18:29 +0200
+
 goodbye (0.1-1) unstable; urgency=low
 
   * Initial release.  Closes: #636016.

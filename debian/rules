@@ -98,6 +98,7 @@ int do_target(const char *target)                                              \
         mkdir("usr/share/doc/goodbye", 0777);                                  \
         system("gzip -9 <debian/changelog "                                    \
                ">usr/share/doc/goodbye/changelog.Debian.gz");                  \
+        system("gzip -9 <ChangeLog >usr/share/doc/goodbye/changelog.gz");      \
         link("debian/copyright", "usr/share/doc/goodbye/copyright");           \
         system("tar cfz data.tar.gz --owner root --group root usr --mode og-w"); \
                                                                                \
