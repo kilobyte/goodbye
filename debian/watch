@@ -1,0 +1,3 @@
+version=3
+opts=downloadurlmangle=s/trees/archive-tarball/,filenamemangle=s/.*\/(.*)/goodbye-$1.tar.gz/ \
+  http://gitorious.org/pkg-goodbye/goodbye/trees/(\d+\.\d+)
