@@ -1,0 +1,40 @@
+Q: What's the purpose of this?
+A: To teach people the inner workings of Debian binary package format.
+   Having fun perverting the spirit (but not wording!) of the Policy is
+   an extra bonus.
+
+Q: But... it can't be policy compliant, can it?
+A: It is!  I consider violating the policy, or lintian --pedantic, a
+   serious bug. Being an example, "goodbye" must be squeaking clean.
+
+Q: You use C, rather than Brainf*ck/Whitespace/Clojure.
+A: Would be fun, but most of readers know C but not those.  To be
+   educational, the code must be understandable.
+
+Q: You could make debian/rules an embedded ELF object, and rebuild it
+   from shipped source.
+A: Hmm, tempting.  This would pervert the DFSG: source for every binary
+   is provided, all builds scripts are there, no shipped binary is put
+   into the resulting package, etc.  However, it would smell too close
+   to waf, and I don't want anything of that kind on me.
+
+Q: But, you could do some trusting trust, Ken Thompson's way!
+A: Hah, and somehow compilers Build-Depending on themselves get accepted
+   into the archive.  gcc is not a culprit here: it is buildable with
+   clang, clang is buildable with gcc.
+   Having a binary debian/rules compile itself from source, and add some
+   "extras" would be sweet.  Another time, though...
+
+Q: What about the speed benefit?  Is debhelper that slow?
+A: debhelper can take a couple of seconds on a new machine, several on
+   a new low-end amd64 and more on slower archs.  There's 19.4k packages
+   in Debian, in 2011 a complete archive rebuild was said to take 340
+   core-hours, skipping debhelper could give us a 3% speed boost!
+   Of course, sacrificing human time for a bit of computer time would
+   in this case be insane, but hey! :p
+
+Q: You use system("gzip -9"), system("tar").  That fork and starting a
+   new process is slow, shouldn't you use zlib directly?
+A: That would be premature optimization, "goodbye" already takes
+   shorter for a complete build than usual wrappers like debuild or
+   dpkg-buildpackage.
