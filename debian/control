@@ -16,3 +16,7 @@ Description: next part after 'hello', and a packaging example
  In fact, though, it is an example for Debian developers: a showcase of
  efficient packaging techniques.  It doesn’t require slow debhelper or even
  dpkg-dev, but uses a JIT compiler for speed.
+ .
+ (In case this is not obvious: this is a joke, but not devoid of educational
+ value: it showcases inner workings of the .deb package format.  You are NOT
+ supposed to follow the techniques used here, though.)
