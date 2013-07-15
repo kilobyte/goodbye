@@ -28,7 +28,7 @@ int gencontrol() // also, fills in ver                                         \
                                                                                \
     src = fopen("debian/control", "r");                                        \
     if (!src)                                                                  \
-        ERROR("Can’t read debian/control.\n");                                 \
+        ERROR("Can’t read debian/control: %m.\n");                             \
     fread(desc, 1, sizeof(desc), src);                                         \
     if (!(ds = strstr(desc, "\nDescription: ")))                               \
         ERROR("Can’t find the description in debian/control.\n");              \
@@ -39,7 +39,7 @@ int gencontrol() // also, fills in ver                                         \
                                                                                \
     out = fopen("control", "w");                                               \
     if (!out)                                                                  \
-        ERROR("Can’t create the control file.\\n");                            \
+        ERROR("Can’t create the control file: %m.\\n");                        \
     fprintf(out,                                                               \
         "Package: goodbye\\n"                                                  \
         "Version: %s\\n"                                                       \
@@ -50,17 +50,23 @@ int gencontrol() // also, fills in ver                                         \
         "Homepage: https://gitorious.org/pkg-goodbye\\n"                       \
         "%*s",                                                                 \
         ver, (int)(de - ds), ds);                                              \
-    fclose(out);                                                               \
-    return 0;                                                                  \
+    return ferror(out) || fclose(out);                                         \
 }                                                                              \
                                                                                \
 int gendbinary()                                                               \
 {                                                                              \
     FILE *f = fopen("debian-binary", "w");                                     \
     if (!f)                                                                    \
-        ERROR("Can’t create debian-binary.\\n");                               \
+        ERROR("Can’t create debian-binary: %m.\\n");                           \
     fprintf(f, "2.0\\n");                                                      \
-    fclose(f);                                                                 \
+    return ferror(f) || fclose(f);                                             \
+}                                                                              \
+                                                                               \
+int do_link(const char *source, const char *target)                            \
+{                                                                              \
+    unlink(target);                                                            \
+    if (link(source, target))                                                  \
+        ERROR("Can’t link %s: %m\\n", target);                                 \
     return 0;                                                                  \
 }                                                                              \
                                                                                \
@@ -68,7 +74,7 @@ int do_target(const char *target)                                              \
 {                                                                              \
     int cmd = 0;                                                               \
     const char *c;                                                             \
-    char str[128];                                                             \
+    char str[256];                                                             \
     FILE *df;                                                                  \
                                                                                \
     // behaviour for undocumented targets is undefined...                      \
@@ -89,22 +95,29 @@ int do_target(const char *target)                                              \
     case 1218: // binary-indep                                                 \
         mkdir("usr", 0777);                                                    \
         mkdir("usr/bin", 0777);                                                \
-        link("goodbye", "usr/bin/goodbye");                                    \
+        if (do_link("goodbye", "usr/bin/goodbye"))                             \
+            return 1;                                                          \
         mkdir("usr/share", 0777);                                              \
         mkdir("usr/share/man", 0777);                                          \
         mkdir("usr/share/man/man1", 0777);                                     \
-        system("gzip -9 <goodbye.1 >usr/share/man/man1/goodbye.1.gz");         \
+        if (system("gzip -9 <goodbye.1 >usr/share/man/man1/goodbye.1.gz"))     \
+            return 1;                                                          \
         mkdir("usr/share/doc", 0777);                                          \
         mkdir("usr/share/doc/goodbye", 0777);                                  \
-        system("gzip -9 <debian/changelog "                                    \
-               ">usr/share/doc/goodbye/changelog.Debian.gz");                  \
-        system("gzip -9 <ChangeLog >usr/share/doc/goodbye/changelog.gz");      \
-        link("debian/copyright", "usr/share/doc/goodbye/copyright");           \
-        system("tar cfz data.tar.gz --owner root --group root usr --mode og-w"); \
+        if (system("gzip -9 <debian/changelog "                                \
+               ">usr/share/doc/goodbye/changelog.Debian.gz"))                  \
+            return 1;                                                          \
+        if (system("gzip -9 <ChangeLog >usr/share/doc/goodbye/changelog.gz"))  \
+            return 1;                                                          \
+        if (do_link("debian/copyright", "usr/share/doc/goodbye/copyright"))    \
+            return 1;                                                          \
+        if (system("tar cfz data.tar.gz --owner root --group root usr --mode og-w")) \
+            return 1;                                                          \
                                                                                \
         if (gencontrol())                                                      \
             return 1;                                                          \
-        system("tar cfz control.tar.gz control");                              \
+        if (system("tar cfz control.tar.gz control"))                          \
+            return 1;                                                          \
                                                                                \
         if (gendbinary())                                                      \
             return 1;                                                          \
@@ -120,9 +133,10 @@ int do_target(const char *target)                                              \
         if (!df)                                                               \
             ERROR("Can’t create debian/files.\\n");                            \
         fprintf(df, "goodbye_%s_all.deb misc optional\\n", ver);               \
-        return 0;                                                              \
+        return ferror(df) || fclose(df);                                       \
     case 515:  // clean                                                        \
-        system("rm -rf usr");                                                  \
+        if (system("rm -rf usr"))                                              \
+            return 1;                                                          \
         unlink("control");                                                     \
         unlink("debian-binary");                                               \
         unlink("data.tar.gz");                                                 \
