@@ -1,3 +1,12 @@
+goodbye (0.3-1) unstable; urgency=low
+
+  * New "upstream" release, with extra docs.
+  * Add a watch file.
+  * Point to Gitorious as a homepage.
+  * Fail on all errors, verbosely.
+
+ -- Adam Borowski <kilobyte@angband.pl>  Tue, 16 Jul 2013 00:10:11 +0200
+
 goodbye (0.2-1) unstable; urgency=low
 
   * New "upstream" release.
