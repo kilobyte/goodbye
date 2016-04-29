@@ -70,6 +70,9 @@ int do_link(const char *source, const char *target)                            \
     return 0;                                                                  \
 }                                                                              \
                                                                                \
+#define RUN(x) if (system(x)) return 1;                                        \
+#define LINK(x, y) if (do_link(x, y)) return 1;                                \
+                                                                               \
 int do_target(const char *target)                                              \
 {                                                                              \
     int cmd = 0;                                                               \
@@ -95,33 +98,23 @@ int do_target(const char *target)                                              \
     case 1218: // binary-indep                                                 \
         mkdir("usr", 0777);                                                    \
         mkdir("usr/bin", 0777);                                                \
-        if (do_link("goodbye", "usr/bin/goodbye"))                             \
-            return 1;                                                          \
+        LINK("goodbye", "usr/bin/goodbye");                                    \
         mkdir("usr/share", 0777);                                              \
         mkdir("usr/share/man", 0777);                                          \
         mkdir("usr/share/man/man1", 0777);                                     \
-        if (system("gzip -n9 <goodbye.1 >usr/share/man/man1/goodbye.1.gz"))    \
-            return 1;                                                          \
+        RUN("gzip -n9 <goodbye.1 >usr/share/man/man1/goodbye.1.gz");           \
         mkdir("usr/share/doc", 0777);                                          \
         mkdir("usr/share/doc/goodbye", 0777);                                  \
-        if (system("gzip -n9 <debian/changelog "                               \
-               ">usr/share/doc/goodbye/changelog.Debian.gz"))                  \
-            return 1;                                                          \
-        if (system("gzip -n9 <ChangeLog >usr/share/doc/goodbye/changelog.gz")) \
-            return 1;                                                          \
-        if (do_link("debian/copyright", "usr/share/doc/goodbye/copyright"))    \
-            return 1;                                                          \
-        if (do_link("FAQ", "usr/share/doc/goodbye/FAQ"))                       \
-            return 1;                                                          \
-        if (system("tar cfz data.tar.gz --owner root --group root usr --mode og-w")) \
-            return 1;                                                          \
+        RUN("gzip -n9 <debian/changelog >usr/share/doc/goodbye/changelog.Debian.gz"); \
+        RUN("gzip -n9 <ChangeLog >usr/share/doc/goodbye/changelog.gz");        \
+        LINK("debian/copyright", "usr/share/doc/goodbye/copyright");           \
+        LINK("FAQ", "usr/share/doc/goodbye/FAQ");                              \
+        RUN("tar cfz data.tar.gz --owner root --group root usr --mode og-w");  \
                                                                                \
-        if (system("md5sum `find usr -type f` >md5sums"))                      \
-            return 1;                                                          \
+        RUN("md5sum `find usr -type f` >md5sums");                             \
         if (gencontrol())                                                      \
             return 1;                                                          \
-        if (system("tar cfz control.tar.gz control md5sums"))                  \
-            return 1;                                                          \
+        RUN("tar cfz control.tar.gz control md5sums");                         \
                                                                                \
         if (gendbinary())                                                      \
             return 1;                                                          \
@@ -130,8 +123,7 @@ int do_target(const char *target)                                              \
         unlink(str);                                                           \
         snprintf(str, sizeof(str), "ar r ../goodbye_%s_all.deb debian-binary " \
                                        "control.tar.gz data.tar.gz", ver);     \
-        if (system(str))                                                       \
-            return 1;                                                          \
+        RUN(str);                                                              \
                                                                                \
         df = fopen("debian/files", "w");                                       \
         if (!df)                                                               \
@@ -139,8 +131,7 @@ int do_target(const char *target)                                              \
         fprintf(df, "goodbye_%s_all.deb misc optional\\n", ver);               \
         return ferror(df) || fclose(df);                                       \
     case 515:  // clean                                                        \
-        if (system("rm -rf usr"))                                              \
-            return 1;                                                          \
+        RUN("rm -rf usr");                                                     \
         unlink("control");                                                     \
         unlink("md5sums");                                                     \
         unlink("debian-binary");                                               \
