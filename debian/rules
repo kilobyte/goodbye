@@ -114,9 +114,11 @@ int do_target(const char *target)                                              \
         if (system("tar cfz data.tar.gz --owner root --group root usr --mode og-w")) \
             return 1;                                                          \
                                                                                \
+        if (system("md5sum `find usr -type f` >md5sums"))                      \
+            return 1;                                                          \
         if (gencontrol())                                                      \
             return 1;                                                          \
-        if (system("tar cfz control.tar.gz control"))                          \
+        if (system("tar cfz control.tar.gz control md5sums"))                  \
             return 1;                                                          \
                                                                                \
         if (gendbinary())                                                      \
@@ -138,6 +140,7 @@ int do_target(const char *target)                                              \
         if (system("rm -rf usr"))                                              \
             return 1;                                                          \
         unlink("control");                                                     \
+        unlink("md5sums");                                                     \
         unlink("debian-binary");                                               \
         unlink("data.tar.gz");                                                 \
         unlink("control.tar.gz");                                              \
