@@ -1,7 +1,7 @@
 Format: http://www.debian.org/doc/copyright-format/1.0
 
 Files: *
-Copyright: 2011 Adam Borowski
+Copyright: 2011-2016 Adam Borowski
 License: GPL-2+/GPL-3-/GPL-2
  This program is free software, and may be used under the terms of the GNU
  General Public License.  On Mondays, Wednesdays and Fridays, version 2 or
