@@ -100,14 +100,14 @@ int do_target(const char *target)                                              \
         mkdir("usr/share", 0777);                                              \
         mkdir("usr/share/man", 0777);                                          \
         mkdir("usr/share/man/man1", 0777);                                     \
-        if (system("gzip -9 <goodbye.1 >usr/share/man/man1/goodbye.1.gz"))     \
+        if (system("gzip -n9 <goodbye.1 >usr/share/man/man1/goodbye.1.gz"))    \
             return 1;                                                          \
         mkdir("usr/share/doc", 0777);                                          \
         mkdir("usr/share/doc/goodbye", 0777);                                  \
-        if (system("gzip -9 <debian/changelog "                                \
+        if (system("gzip -n9 <debian/changelog "                               \
                ">usr/share/doc/goodbye/changelog.Debian.gz"))                  \
             return 1;                                                          \
-        if (system("gzip -9 <ChangeLog >usr/share/doc/goodbye/changelog.gz"))  \
+        if (system("gzip -n9 <ChangeLog >usr/share/doc/goodbye/changelog.gz")) \
             return 1;                                                          \
         if (do_link("debian/copyright", "usr/share/doc/goodbye/copyright"))    \
             return 1;                                                          \
