@@ -111,6 +111,8 @@ int do_target(const char *target)                                              \
             return 1;                                                          \
         if (do_link("debian/copyright", "usr/share/doc/goodbye/copyright"))    \
             return 1;                                                          \
+        if (do_link("FAQ", "usr/share/doc/goodbye/FAQ"))                       \
+            return 1;                                                          \
         if (system("tar cfz data.tar.gz --owner root --group root usr --mode og-w")) \
             return 1;                                                          \
                                                                                \
