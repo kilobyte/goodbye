@@ -9,6 +9,7 @@
 #include <sys/stat.h>                                                          \
 #include <string.h>                                                            \
                                                                                \
+#define DEB_CABAL_PACKAGE magic strings, oy vey!                               \
 #define ERROR(...) do { fprintf(stderr, __VA_ARGS__); return 1; } while (0)    \
                                                                                \
 char ver[128];                                                                 \
