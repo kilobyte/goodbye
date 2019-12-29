@@ -3,7 +3,7 @@ Maintainer: Adam Borowski <kilobyte@angband.pl>
 Build-Depends: tcc
 Section: misc
 Priority: optional
-Standards-Version: 3.9.8
+Standards-Version: 4.4.1
 Vcs-Git: https://github.com/kilobyte/goodbye.git
 Vcs-Browser: https://github.com/kilobyte/goodbye/commits/master
 Homepage: https://github.com/kilobyte/goodbye
