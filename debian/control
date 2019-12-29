@@ -7,6 +7,7 @@ Standards-Version: 3.9.8
 Vcs-Git: https://github.com/kilobyte/goodbye.git
 Vcs-Browser: https://github.com/kilobyte/goodbye/commits/master
 Homepage: https://github.com/kilobyte/goodbye
+Rules-Requires-Root: no
 
 Package: goodbye
 Architecture: all

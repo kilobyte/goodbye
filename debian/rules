@@ -114,7 +114,7 @@ int do_target(const char *target)                                              \
         RUN("md5sum `find usr -type f` >md5sums");                             \
         if (gencontrol())                                                      \
             return 1;                                                          \
-        RUN("tar cfz control.tar.gz control md5sums");                         \
+        RUN("tar cfz control.tar.gz --owner root --group root control md5sums"); \
                                                                                \
         if (gendbinary())                                                      \
             return 1;                                                          \
