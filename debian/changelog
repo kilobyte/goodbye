@@ -1,3 +1,17 @@
+goodbye (0.4-1) unstable; urgency=medium
+
+  * Actually upload to Debian.  Closes: #636016.
+  * New upstream release, to cope with new Perls.
+  * UMEGAYA (dep12) metadata.
+  * Use https for the copyright file.
+  * R³ -- with tar --owner root.
+  * Current standards.
+  * Update the upstream signing subkey.
+  * An autopkgtest.
+  * TINC.
+
+ -- Adam Borowski <kilobyte@angband.pl>  Sun, 29 Dec 2019 23:57:17 +0100
+
 goodbye (0.3-2) unstable; urgency=medium
 
   * Use gzip -n to build reproducibly.
